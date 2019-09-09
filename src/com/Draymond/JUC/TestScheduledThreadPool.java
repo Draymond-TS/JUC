@@ -1,7 +1,6 @@
 package com.Draymond.JUC;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 /* 一、线程池：提供了一个线程队列。队列保存这所有等待状态的线程。避免了创建与销毁额外开销，提高了响应的速度
@@ -20,64 +19,27 @@ import java.util.concurrent.*;
  *
  *  ScheduleExecutorService newScheduleThreadexecutorService : 创建固定大小的线程，可以延迟或定时的执行任务
  * */
-public class TestThreadPool {
+public class TestScheduledThreadPool {
     public static void main(String [] agrs) throws  Exception{
-        //1.创建线程池
-        ExecutorService executorService= Executors.newFixedThreadPool(5);
+        ScheduledExecutorService scheduledExecutorService= Executors.newScheduledThreadPool(5);
 
-        List<Future<Integer>> list = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            Future<Integer> future = executorService.submit(new Callable<Integer>(){
+        for(int i =0;i<5;i++){
+            ScheduledFuture<Integer> schedule = scheduledExecutorService.schedule(new Callable<Integer>() {
 
                 @Override
                 public Integer call() throws Exception {
-                    int sum = 0;
-
-                    for (int i = 0; i <= 100; i++) {
-                        sum += i;
-                    }
-
-                    return sum;
+                    int num = new Random().nextInt(100);//生成随机数
+                    System.out.println(Thread.currentThread().getName() + " : " + num);
+                    return num;
                 }
+            }, 1, TimeUnit.SECONDS);
 
-            });
-
-            list.add(future);
-        }
-
-        executorService.shutdown();
-
-        for (Future<Integer> future : list) {
-            System.out.println(future.get());
+            System.out.println(schedule.get());
         }
 
 
+        scheduledExecutorService.shutdown();
 
-
-
-        //ThreadexecutorServiceDemo threadexecutorServiceDemo=new ThreadexecutorServiceDemo();
-
-        //2.为线程池的线程分配任务
-        //for(int i=0;i<10;i++){
-            //创建相对应的线程数 来执行同一个任务
-            //executorService.submit(threadexecutorServiceDemo);
-        //}
-
-        //3.关闭线程池
-        //executorService.shutdown();;
     }
 
-}
-
-
-class ThreadexecutorServiceDemo implements Runnable{
-    private int i=0;
-
-    @Override
-    public void run() {
-        while (i<1000 ){
-            System.out.println(Thread.currentThread().getName()+" : "+ i++);
-        }
-    }
 }
